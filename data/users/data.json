@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "accname": "Ilora Grace",
+      "accnumber": "432518874",
+      "email": "iloragrace@gmail.com",
+      "phonenumber": "07022589463"
+    },
+    {
+      "id": 2,
+      "accname": "Precious Mike",
+      "accnumber": "432574231",
+      "email": "preciousmike@gmail.com",
+      "phonenumber": "07024287963"
+    },
+    {
+      "id": 3,
+      "accname": "Mariette Delia",
+      "accnumber": "432558219",
+      "email": "mariettedelia@gmail.com",
+      "phonenumber": "09054827412"
+    },
+    {
+      "id": 4,
+      "accname": "Bluniever Imulda",
+      "accnumber": "432557413",
+      "email": "blunieverimulda@gmail.com",
+      "phonenumber": "08147598200"
+    },
+    {
+      "id": 5,
+      "accname": "Varia Ikay",
+      "accnumber": "4325002541",
+      "email": "variaikay@gmail.com",
+      "phonenumber": "07014852369"
+    }
+  ]
+}
