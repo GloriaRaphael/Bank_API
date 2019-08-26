@@ -1,8 +1,14 @@
 const http = require("http");
+const url = require("url");
+const parse = require("querystring");
+const promisify = require("util").promisify;
 const fs = require("fs");
-const { parse } = require("url");
-const { promisify } = require("util");
-const queryString = require("querystring");
+const open = promisify(fs.open);
+const close = promisify(fs.close);
+const writeFile = promisify(fs.writeFile);
+const readFile = promisify(fs.readFile);
+const unlink = promisify(fs.unlink);
+
 const theData = require("./lib/data");
 
 const port = 3000;
@@ -10,77 +16,64 @@ const host = "127.0.0.1";
 
 //creating server
 const httpServer = http.createServer((req, res) => {
-  theData.create(
-    "users",
-    "data",
-    {
-      id: "id",
-      accname: "accname",
-      accnumber: "accnumber",
-      email: "email",
-      phonenumber: "phonenumber",
-    },
-    function(err) {
-      console.log("File Creation", err);
-    }
-  );
-  res.writeHead(200, "Content-Type", "text/plain");
-
-  var parsedurl = parse(req.url, true);
-  var pathname = parsedurl.pathname;
-  var trimedpath = pathname.replace(/^\/+|\/+$/g, "");
-  var queryString = parsedurl.query;
-  var headers = req.headers;
-  var method = req.method.toLowerCase();
-
-  var decoder = new stringDecoder("utf-8");
-  var buffer = "";
-  req.on("data", function(datachunk) {
-    buffer += decoder.write(datachunk);
-  });
+  if (req.method === "POST") {
+    Post(req, res);
+  }
+  if (req.method === "GET") {
+    Get(req, res);
+  }
 });
-
-req.on("end", function() {
-  decoder.end();
-
-  var data = {
-    trimedPath: trimedPath,
-    query: queryString,
-    method: method,
-    headers: headers,
-    payload: helper.parsejsonObject(buffer),
-  };
-
-  console.log("trimed path", trimedPath);
-  var chosenhandler =
-    typeof router[trimedPath] !== "undefined"
-      ? router[trimedPath]
-      : handler.notFound;
-
-  chosenhandler(data, function(statuscode, payload) {
-    var payloadString = JSON.stringify(payload);
-    statuscode = typeof statuscode == "number" ? statuscode : 200;
-    res.setHeader("Content-Type", "application/json");
-    res.writeHead(statuscode);
-    res.end(payloadString);
-    console.log("end response" + " trimed path " + statuscode, payload);
-  });
-});
-
-var handler = {};
-
-handler.ping = (data, callback) => {
-  callback(200, { success: true });
-};
-
-handler.notFound = (data, callback) => {
-  callback(404, { success: false, message: "Not found" });
-};
-
-var router = {
-  ping: handler.ping,
-};
 
 httpServer.listen(port, host, () => {
   console.log(`Server running on port: ${port} host: ${host}`);
 });
+
+function Post(req, res) {
+  var body = "";
+  req.on("data", function(datachunk) {
+    body += datachunk.toString();
+  });
+
+  req.on("end", () => {
+    readFile(`./data/${req.url}/data.json`, "utf-8")
+      .then(data => {
+        stringData = JSON.parse(body);
+        data = JSON.parse(data);
+        data.users.push(stringData);
+        return writeFile(
+          `./data/${req.url}/data.json`,
+          JSON.stringify(data, null, "\t")
+        );
+      })
+      .then(() => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/plain");
+        res.end(`Posted!`);
+      });
+  });
+}
+
+function Get(req, res) {
+  if (req.url != "/users") {
+    pathArr = req.url.split("/");
+    path = pathArr[1];
+    id = pathArr[2];
+    readFile(`./data/${path}/data.json`, "utf-8").then(data => {
+      data = JSON.parse(data);
+      data.users.forEach(item => {
+        if (item.id == id) {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(item));
+        }
+      });
+    });
+  } else {
+    readFile(`./data/${req.url}/data.json`, "utf-8").then(data => {
+      data = JSON.parse(data);
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(data));
+    });
+  }
+}

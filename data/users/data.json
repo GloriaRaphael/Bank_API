@@ -34,6 +34,20 @@
       "accnumber": "4325002541",
       "email": "variaikay@gmail.com",
       "phonenumber": "07014852369"
+    },
+    {
+      "id": 1,
+      "accname": "Manuel Chicken",
+      "accnumber": "432518452",
+      "email": "manuelchicken@gmail.com",
+      "phonenumber": "07022114578"
+    },
+    {
+      "id": 1,
+      "accname": "Ngene Manuel",
+      "accnumber": "432518452",
+      "email": "manuelchicken@gmail.com",
+      "phonenumber": "07022114578"
     }
   ]
 }
